@@ -210,6 +210,7 @@ class SentenceTransformer(nn.Sequential):
         sentences: Union[str, List[str]],
         batch_size: int = 32,
         show_progress_bar: bool = None,
+        track_progress_path: Optional[str] = None,
         output_value: str = "sentence_embedding",
         convert_to_numpy: bool = True,
         convert_to_tensor: bool = False,
@@ -222,6 +223,7 @@ class SentenceTransformer(nn.Sequential):
         :param sentences: the sentences to embed
         :param batch_size: the batch size used for the computation
         :param show_progress_bar: Output a progress bar when encode sentences
+        :param track_progress_path: Write progress to file
         :param output_value:  Default sentence_embedding, to get sentence embeddings. Can be set to token_embeddings to get wordpiece token embeddings. Set to None, to get all output values
         :param convert_to_numpy: If true, the output is a list of numpy vectors. Else, it is a list of pytorch tensors.
         :param convert_to_tensor: If true, you get one large tensor as return. Overwrites any setting from convert_to_numpy
@@ -264,6 +266,10 @@ class SentenceTransformer(nn.Sequential):
         for start_index in trange(
             0, len(sentences), batch_size, desc="Batches", disable=not show_progress_bar
         ):
+            if track_progress_path:
+                with open(track_progress_path, "w+") as f:
+                    f.write(f"{start_index},{len(sentences)}")
+
             sentences_batch = sentences_sorted[start_index : start_index + batch_size]
             features = self.tokenize(sentences_batch)
             features = batch_to_device(features, device)
