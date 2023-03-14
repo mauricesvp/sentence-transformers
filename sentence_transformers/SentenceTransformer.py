@@ -310,6 +310,11 @@ class SentenceTransformer(nn.Sequential):
 
         all_embeddings = [all_embeddings[idx] for idx in np.argsort(length_sorted_idx)]
 
+        if track_progress_path:
+            with open(track_progress_path, "w+") as f:
+                f.write(f"{len(sentences)},{len(sentences)}")
+
+
         if convert_to_tensor:
             all_embeddings = torch.stack(all_embeddings)
         elif convert_to_numpy:
